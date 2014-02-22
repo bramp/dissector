@@ -1,6 +1,6 @@
 package net.bramp.dissector.node;
 
-import net.bramp.dissector.io.DataPositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 
 import java.io.IOException;
 
@@ -14,10 +14,10 @@ public class SkipNode extends Node {
 
     public SkipNode() {}
 
-    public SkipNode read(DataPositionInputStream in, long length) throws IOException {
+    public SkipNode read(ExtendedRandomAccessFile in, long length) throws IOException {
         super.setPos(in, length);
         value = length;
-        in.skip(length);
+        in.skipBytes(length);
         return this;
     }
 

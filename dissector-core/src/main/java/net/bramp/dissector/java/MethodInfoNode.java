@@ -1,6 +1,6 @@
 package net.bramp.dissector.java;
 
-import net.bramp.dissector.io.DataPositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import net.bramp.dissector.node.ArrayNode;
 import net.bramp.dissector.node.MaskNode;
 import net.bramp.dissector.node.ShortNode;
@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public class MethodInfoNode extends TreeNode {
 
-    public MethodInfoNode read(DataPositionInputStream in) throws IOException {
+    public MethodInfoNode read(ExtendedRandomAccessFile in) throws IOException {
 
         addChild( "access_flags", new MaskNode(JavaClassDissector.accessFlags).read(in, 2) );
         addChild( "name_index", new ShortNode().read(in) );

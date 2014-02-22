@@ -1,14 +1,10 @@
 package net.bramp.dissector.node;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import net.bramp.dissector.OrderPreservingMap;
-import net.bramp.dissector.io.DataPositionInputStream;
-import net.bramp.dissector.io.PositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,7 +29,7 @@ public class TreeNode extends Node {
         return node;
     }
 
-    public TreeNode read(DataPositionInputStream in) throws IOException {
+    public TreeNode read(ExtendedRandomAccessFile in) throws IOException {
         super.setPos(in, 0);
         return this;
     }

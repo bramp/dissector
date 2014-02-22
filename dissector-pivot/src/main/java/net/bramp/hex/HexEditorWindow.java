@@ -1,19 +1,13 @@
 package net.bramp.hex;
 
 import com.google.common.base.Throwables;
-import net.bramp.dissector.NodePrinter;
-import net.bramp.dissector.io.DataPositionInputStream;
-import net.bramp.dissector.png.PngDissector;
 import org.apache.pivot.beans.BXML;
 import org.apache.pivot.beans.Bindable;
 import org.apache.pivot.collections.Map;
 import org.apache.pivot.util.Resources;
-import org.apache.pivot.wtk.TextArea;
 import org.apache.pivot.wtk.Window;
 
-import java.io.EOFException;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URL;
 

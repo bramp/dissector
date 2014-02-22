@@ -1,16 +1,12 @@
 package net.bramp.dissector.pivot;
 
-import net.bramp.dissector.io.DataPositionInputStream;
-import net.bramp.dissector.node.Node;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import net.bramp.dissector.png.PngDissector;
 import org.apache.pivot.beans.BXML;
 import org.apache.pivot.beans.Bindable;
 import org.apache.pivot.collections.Map;
-import org.apache.pivot.collections.Sequence;
 import org.apache.pivot.util.Resources;
 import org.apache.pivot.wtk.*;
-import org.apache.pivot.wtk.content.TreeBranch;
-import org.apache.pivot.wtk.content.TreeNode;
 
 import java.io.IOException;
 import java.net.URL;
@@ -55,7 +51,7 @@ public class MainView extends Window implements Bindable {
     public void initialize(Map<String, Object> namespace, URL location, Resources resources) {
 
         try {
-            DataPositionInputStream in = new DataPositionInputStream( getClass().getResourceAsStream("z09n2c08.png") );
+            ExtendedRandomAccessFile in = new ExtendedRandomAccessFile( getClass().getResourceAsStream("z09n2c08.png") );
             PngDissector dissector = new PngDissector().read(in);
 
             //treeView.setNodeRenderer();

@@ -1,6 +1,6 @@
 package net.bramp.dissector.node;
 
-import net.bramp.dissector.io.DataPositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 
 import java.io.IOException;
 
@@ -14,11 +14,11 @@ public class IntNode extends Node {
 
     public IntNode() {}
 
-    public IntNode read(DataPositionInputStream in) throws IOException {
+    public IntNode read(ExtendedRandomAccessFile in) throws IOException {
         return read(in, false);
     }
 
-    public IntNode read(DataPositionInputStream in, boolean signed) throws IOException {
+    public IntNode read(ExtendedRandomAccessFile in, boolean signed) throws IOException {
         super.setPos(in, 4);
         value = signed ? in.readInt() : in.readUnsignedInt();
         return this;

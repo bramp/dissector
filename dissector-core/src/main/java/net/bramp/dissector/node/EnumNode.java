@@ -1,7 +1,7 @@
 package net.bramp.dissector.node;
 
-import com.google.common.base.Preconditions;
-import net.bramp.dissector.io.DataPositionInputStream;
+import com.google.common.collect.ImmutableMap;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 
 import java.io.IOException;
 import java.util.Map;
@@ -19,7 +19,7 @@ public class EnumNode extends Node {
         this.values = values;
     }
 
-    public EnumNode read(DataPositionInputStream in, int length) throws IOException {
+    public EnumNode read(ExtendedRandomAccessFile in, int length) throws IOException {
         super.setPos(in, length);
 
         value = in.readUnsignedIntOfLength(length);
@@ -37,5 +37,9 @@ public class EnumNode extends Node {
 
     public String toString() {
         return Long.toString(value) + " - " + name();
+    }
+
+    public Map<Integer, String> getPossibleValues() {
+        return ImmutableMap.copyOf(values);
     }
 }

@@ -1,16 +1,9 @@
 package net.bramp.dissector.disk;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import net.bramp.dissector.io.DataPositionInputStream;
-import net.bramp.dissector.java.AttributeInfoNode;
-import net.bramp.dissector.java.ConstantPoolNode;
-import net.bramp.dissector.java.FieldInfoNode;
-import net.bramp.dissector.java.MethodInfoNode;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import net.bramp.dissector.node.*;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * Structure of a modern standard MBR
@@ -21,7 +14,7 @@ public class MBRDissector extends Dissector {
 
     public MBRDissector() {}
 
-    public MBRDissector read(DataPositionInputStream in) throws IOException {
+    public MBRDissector read(ExtendedRandomAccessFile in) throws IOException {
 
         addChild( "Boostrap code", new SkipNode().read(in, 218) );
 

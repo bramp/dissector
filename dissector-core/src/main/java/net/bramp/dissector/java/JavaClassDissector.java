@@ -2,7 +2,7 @@ package net.bramp.dissector.java;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import net.bramp.dissector.io.DataPositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import net.bramp.dissector.node.*;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class JavaClassDissector extends Dissector {
 
     public JavaClassDissector() {}
 
-    public JavaClassDissector read(DataPositionInputStream in) throws IOException {
+    public JavaClassDissector read(ExtendedRandomAccessFile in) throws IOException {
         Preconditions.checkNotNull(in);
 
         ShortNode len;

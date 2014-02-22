@@ -1,6 +1,6 @@
 package net.bramp.dissector.java;
 
-import net.bramp.dissector.io.DataPositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import net.bramp.dissector.node.FixedStringNode;
 import net.bramp.dissector.node.IntNode;
 import net.bramp.dissector.node.ShortNode;
@@ -14,7 +14,7 @@ import java.io.IOException;
 public class AttributeInfoNode extends TreeNode {
 
     @Override
-    public TreeNode read(DataPositionInputStream in) throws IOException {
+    public TreeNode read(ExtendedRandomAccessFile in) throws IOException {
 
         addChild( "name_index", new ShortNode().read(in) );
 

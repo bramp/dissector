@@ -1,8 +1,7 @@
 package net.bramp.dissector.png;
 
-import net.bramp.dissector.io.DataPositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import net.bramp.dissector.node.Dissector;
-import net.bramp.dissector.node.TreeNode;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -14,7 +13,7 @@ public class PngDissector extends Dissector {
 
     public PngDissector() {}
 
-    public PngDissector read(DataPositionInputStream in) throws IOException {
+    public PngDissector read(ExtendedRandomAccessFile in) throws IOException {
         addChild( "Header", new PngHeaderNode().read(in) );
 
         try {

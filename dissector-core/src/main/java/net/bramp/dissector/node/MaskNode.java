@@ -1,6 +1,7 @@
 package net.bramp.dissector.node;
 
-import net.bramp.dissector.io.DataPositionInputStream;
+import com.google.common.collect.ImmutableMap;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 
 import java.io.IOException;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class MaskNode extends Node {
         this.values = values;
     }
 
-    public MaskNode read(DataPositionInputStream in, int length) throws IOException {
+    public MaskNode read(ExtendedRandomAccessFile in, int length) throws IOException {
         super.setPos(in, length);
 
         value = in.readUnsignedIntOfLength(length);
@@ -44,5 +45,9 @@ public class MaskNode extends Node {
             sb.setLength( sb.length() - 1 );
 
         return sb.toString();
+    }
+
+    public Map<Integer, String> getPossibleValues() {
+        return ImmutableMap.copyOf(values);
     }
 }

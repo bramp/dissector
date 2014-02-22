@@ -1,7 +1,7 @@
 package net.bramp.dissector.disk;
 
 import com.google.common.collect.ImmutableMap;
-import net.bramp.dissector.io.DataPositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import net.bramp.dissector.node.*;
 
 import java.io.IOException;
@@ -274,7 +274,7 @@ public class PartitionEntryNode extends TreeNode {
         .put(0xff, "XENIX BBT")
         .build();
 
-    public PartitionEntryNode read(DataPositionInputStream in) throws IOException {
+    public PartitionEntryNode read(ExtendedRandomAccessFile in) throws IOException {
         //addChild("skip", new FixedStringNode().read(in, 16) );
         addChild("status", new ByteNode().read(in).base(16) );
         addChild("first sector (chs)", new CHSAddressNode().read(in));

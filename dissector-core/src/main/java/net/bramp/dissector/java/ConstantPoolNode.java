@@ -1,7 +1,7 @@
 package net.bramp.dissector.java;
 
 import com.google.common.collect.ImmutableMap;
-import net.bramp.dissector.io.DataPositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import net.bramp.dissector.node.*;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class ConstantPoolNode extends TreeNode {
 
     public ConstantPoolNode() {}
 
-    public ConstantPoolNode read(DataPositionInputStream in) throws IOException {
+    public ConstantPoolNode read(ExtendedRandomAccessFile in) throws IOException {
         super.read(in);
 
         EnumNode type = addChild( "tag", new EnumNode(constantTypes).read(in, 1) );

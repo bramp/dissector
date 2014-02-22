@@ -1,6 +1,6 @@
 package net.bramp.dissector.node;
 
-import net.bramp.dissector.io.DataPositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ public class FloatNode extends Node {
 
     public FloatNode() {}
 
-    public FloatNode read(DataPositionInputStream in) throws IOException {
+    public FloatNode read(ExtendedRandomAccessFile in) throws IOException {
         super.setPos(in, 4);
         value = in.readFloat();
         return this;

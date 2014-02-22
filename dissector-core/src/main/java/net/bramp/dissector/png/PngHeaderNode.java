@@ -1,6 +1,6 @@
 package net.bramp.dissector.png;
 
-import net.bramp.dissector.io.DataPositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import net.bramp.dissector.node.ByteNode;
 import net.bramp.dissector.node.FixedStringNode;
 import net.bramp.dissector.node.TreeNode;
@@ -14,7 +14,7 @@ public class PngHeaderNode extends TreeNode {
 
     public PngHeaderNode() {}
 
-    public PngHeaderNode read(DataPositionInputStream in) throws IOException {
+    public PngHeaderNode read(ExtendedRandomAccessFile in) throws IOException {
 
         addChild("0x89", new ByteNode().read(in) );
         addChild("Magic", new FixedStringNode().read(in, 3) );

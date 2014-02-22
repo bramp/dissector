@@ -2,7 +2,7 @@ package net.bramp.dissector.png;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
-import net.bramp.dissector.io.DataPositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import net.bramp.dissector.node.*;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class PngChunkNode extends TreeNode {
 
     public PngChunkNode() {}
 
-    public PngChunkNode read(DataPositionInputStream in) throws IOException {
+    public PngChunkNode read(ExtendedRandomAccessFile in) throws IOException {
         IntNode length       = new IntNode().read(in, false);
         FixedStringNode type = new FixedStringNode().read(in, 4, Charsets.US_ASCII);
 
@@ -56,11 +56,11 @@ public class PngChunkNode extends TreeNode {
         return this;
     }
 
-    protected void readUnknown(DataPositionInputStream in, long length) throws IOException {
+    protected void readUnknown(ExtendedRandomAccessFile in, long length) throws IOException {
         addChild("Data", new SkipNode().read(in, length) );
     }
 
-    protected void readIHDR(DataPositionInputStream in) throws IOException {
+    protected void readIHDR(ExtendedRandomAccessFile in) throws IOException {
         addChild("Width", new IntNode().read(in, false) );
         addChild("Height", new IntNode().read(in, false) );
         addChild("Bit depth", new ByteNode().read(in, false) );

@@ -1,6 +1,6 @@
 package net.bramp.dissector.node;
 
-import net.bramp.dissector.io.DataPositionInputStream;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 
 import java.io.IOException;
 
@@ -13,11 +13,11 @@ public class ShortNode extends Node {
 
     public ShortNode() {}
 
-    public ShortNode read(DataPositionInputStream in) throws IOException {
+    public ShortNode read(ExtendedRandomAccessFile in) throws IOException {
         return read(in, false);
     }
 
-    public ShortNode read(DataPositionInputStream in, boolean signed) throws IOException {
+    public ShortNode read(ExtendedRandomAccessFile in, boolean signed) throws IOException {
         super.setPos(in, 2);
         value = signed ? in.readShort() : in.readUnsignedShort();
         return this;

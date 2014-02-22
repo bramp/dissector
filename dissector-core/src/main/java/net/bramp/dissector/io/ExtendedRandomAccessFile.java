@@ -1,20 +1,18 @@
 package net.bramp.dissector.io;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * @author bramp
  */
-public class DataPositionInputStream extends DataInputStream {
+public class ExtendedRandomAccessFile extends RandomAccessFile {
 
-    public DataPositionInputStream(InputStream in) {
-        super( new PositionInputStream(in) );
+    public ExtendedRandomAccessFile(String filename, String mode) throws FileNotFoundException {
+        super( filename, mode );
     }
 
-    public synchronized long getPosition() {
-       return ((PositionInputStream)in).getPosition();
+    public ExtendedRandomAccessFile(File file, String mode) throws FileNotFoundException {
+        super( file, mode );
     }
 
     /**
@@ -52,5 +50,10 @@ public class DataPositionInputStream extends DataInputStream {
             return (int)readUnsignedInt();
         else
             throw new IllegalArgumentException("Invalid value for length");
+    }
+
+    public void skipBytes(long length) throws IOException {
+        // The standard Java RandomAccessFile.skipBytes doesn't support skip with a long!
+        this.seek( this.getFilePointer() + length );
     }
 }
