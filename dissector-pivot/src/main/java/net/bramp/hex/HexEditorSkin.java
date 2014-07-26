@@ -1,11 +1,9 @@
 package net.bramp.hex;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import org.apache.pivot.collections.ArrayList;
 import org.apache.pivot.collections.Dictionary;
-import org.apache.pivot.collections.Sequence;
 import org.apache.pivot.wtk.*;
+import org.apache.pivot.wtk.Insets;
 import org.apache.pivot.wtk.TextArea;
 import org.apache.pivot.wtk.skin.ComponentSkin;
 
@@ -15,11 +13,11 @@ import java.awt.font.GlyphVector;
 import java.awt.font.LineMetrics;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * @author bramp
@@ -104,38 +102,53 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
     //private ApplicationContext.ScheduledCallback scheduledScrollSelectionCallback = null;
 
     private Font font;
-    private Color color;
-    private Color backgroundColor;
-    private Color inactiveColor;
-    private Color selectionColor;
-    private Color selectionBackgroundColor;
-    private Color inactiveSelectionColor;
-    private Color inactiveSelectionBackgroundColor;
-    private org.apache.pivot.wtk.Insets margin;
+    private Color color = Color.BLACK;
+    private Color backgroundColor = Color.WHITE;
+    private Color inactiveColor = Color.GRAY;
+    private Color selectionColor = Color.LIGHT_GRAY;
+    private Color selectionBackgroundColor = Color.BLUE;
+    private Color inactiveSelectionColor = Color.LIGHT_GRAY;
+    private Color inactiveSelectionBackgroundColor = Color.BLACK;
+    private Insets margin = new Insets(4);
 
     private Dimensions averageCharacterSize;
+    private int lineHeight;
+    private int marginTop;
+    private int fontAscent;
 
-    //private ArrayList<TextAreaSkinParagraphView> paragraphViews = new ArrayList<TextAreaSkinParagraphView>();
 
+    /** TODO Create show booleans
+    private boolean showAddress = true;
+    private boolean showHex = true;
+    private boolean showRaw = true;
+    */
+
+    private static final int addressWidth = 9; // In characters 8 + 1 space
     private static final int SCROLL_RATE = 30;
 
     private RandomAccessFile file;
-    private long offset = 0;
+
+    /**
+     * Total number of lines
+     */
+    private int lines = 1;
+
+    /**
+     * How many bytes to display per line
+     */
+    private final int bytesPerLine = 16;
+
+    private long selectionStart  = 0;
+    private long selectionLength = 0;
+
 
     public HexEditorSkin() {
 
         TableView t;
 
         Theme theme = Theme.getTheme();
-        font = theme.getFont();
-        color = Color.BLACK;
-        backgroundColor = null;
-        inactiveColor = Color.GRAY;
-        selectionColor = Color.LIGHT_GRAY;
-        selectionBackgroundColor = Color.BLACK;
-        inactiveSelectionColor = Color.LIGHT_GRAY;
-        inactiveSelectionBackgroundColor = Color.BLACK;
-        margin = new org.apache.pivot.wtk.Insets(4);
+        font = theme.getFont(); // TODO default to monospace font
+	    calculateFontBounds();
     }
 
     @Override
@@ -155,7 +168,7 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
 
     @Override
     public int getPreferredWidth(int height) {
-        int charsPerLine = getHexEditor().getBytesPerLine() * 4 + 9;
+        int charsPerLine = bytesPerLine * 4 + addressWidth;
         int preferredWidth = averageCharacterSize.width * charsPerLine;
         preferredWidth += margin.left + margin.right;
         return preferredWidth;
@@ -163,23 +176,40 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
 
     @Override
     public int getPreferredHeight(int width) {
-        int preferredHeight = averageCharacterSize.height;
+        int preferredHeight = (int) (averageCharacterSize.height * numberOfLines);
         preferredHeight += margin.top + margin.bottom;
         return preferredHeight;
     }
 
     @Override
     public Dimensions getPreferredSize() {
-        int preferredWidth  = getPreferredWidth(0);
-        int preferredHeight = getPreferredHeight(0);
+        int preferredWidth  = getPreferredWidth(-1);
+        int preferredHeight = getPreferredHeight(-1);
 
         return new Dimensions(preferredWidth, preferredHeight);
+    }
+
+    private long calcFileLength() {
+        try {
+            return file != null ? file.length() : 0;
+        } catch (IOException e) {
+            return 0;
+        }
     }
 
     @SuppressWarnings("unused")
     @Override
     public void layout() {
         HexEditor editor = getHexEditor();
+
+        this.fileLength = calcFileLength();
+        this.numberOfLines = (int) ((fileLength / this.bytesPerLine) + 1); // TODO 2GB
+
+        FontRenderContext fontRenderContext = Platform.getFontRenderContext();
+        LineMetrics lm = font.getLineMetrics("", fontRenderContext);
+
+        fontAscent = (int) lm.getAscent();
+        marginTop  = (int) (margin.top + lm.getAscent());
 
         /*
         int width = getWidth();
@@ -238,27 +268,27 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
         return '.';
     }
 
+    /* Some temp objects to aid in face rendering */
     final StringBuilder hexSB = new StringBuilder();
     final StringBuilder rawSB = new StringBuilder();
+    byte[] lineBuffer = new byte[bytesPerLine];
 
     /**
      * Builds a single line of text
      * @return
      * @throws IOException
      */
-    private String buildLine(long offset, int bytesPerLine) throws IOException {
+    private String buildLine(long offset) throws IOException {
         if (file == null)
-            return "Nothing"; // TODO This should be "0000000: "
+            return "00000000: ";
 
         hexSB.setLength(0);
         rawSB.setLength(0);
         file.seek(offset);
 
-        byte[] line = new byte[bytesPerLine];
-
-        int len = file.read(line);
+        int len = file.read(lineBuffer);
         for (int i = 0; i < len; i++) {
-            byte b = line[i];
+            byte b = lineBuffer[i];
 
             hexSB.append( String.format("%02X ", b) );
             rawSB.append( printable(b) );
@@ -267,7 +297,7 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
         expand(hexSB, bytesPerLine * 3, ' ');
         expand(rawSB, bytesPerLine, ' ');
 
-        StringBuilder totalSB = new StringBuilder(bytesPerLine * 4 + 9);
+        StringBuilder totalSB = new StringBuilder(bytesPerLine * 4 + addressWidth);
         totalSB
             .append(String.format("%08X ", offset))
             .append(hexSB)
@@ -276,13 +306,90 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
         return totalSB.toString();
     }
 
+    private boolean inSelectedRange(long offset, int length) {
+        long offsetEnd = offset + length;
+        long selectionEnd = selectionStart + selectionLength;
+        /*
+        return selectionLength > 0 &&
+                ((selectionStart >= offset && selectionStart <= offsetEnd) ||
+                (selectionEnd >= offset && selectionEnd <= offsetEnd));
+        */
+
+        return selectionLength > 0 &&
+                (selectionStart <= offset + length && selectionEnd >= offset);
+    }
+
+    /**
+     * Returns byte offset
+     * @param x x coord
+     * @param y y xoord
+     * @return
+     */
+    @Override
+    public long getByteAt(int x, int y) {
+        int row = getRowAt(y);
+        if (row == -1)
+            return -1;
+
+        int col = getColAt(x);
+        if (col == -1)
+            return -1;
+
+        return row * bytesPerLine + col;
+    }
+
+    /**
+     *
+     * @param y screen coord
+     * @return
+     */
+    public int getRowAt(int y) {
+        y -= marginTop;
+        if (y < 0)
+            return -1;
+
+        int row = y / lineHeight;
+        if (row >= this.numberOfLines)
+            return -1;
+
+        return row;
+    }
+
+    /**
+     *
+     * @param x screen coord
+     * @return The column this byte is in, OR, -1 if outside range
+     */
+    public int getColAt(int x) {
+        int charWidth  = averageCharacterSize.width;
+        int marginLeft = margin.left + charWidth * addressWidth;
+        x -= marginLeft;
+
+        // Are we in the hex or raw?
+        if (x < 0) {
+            return -1;
+
+        } else if (x > charWidth * bytesPerLine * 3) {
+            // Raw
+            x -= charWidth * bytesPerLine * 3;
+        } else {
+            // Hex (each byte is 3 chars wide)
+            charWidth *= 3;
+        }
+
+        int col = x / charWidth;
+        if (col >= bytesPerLine)
+            return -1;
+        return col;
+    }
+
     @Override
     public void paint(Graphics2D graphics) {
+
         HexEditor editor = getHexEditor();
         int width  = getWidth();
         int height = getHeight();
 
-        final int bytesPerLine = editor.getBytesPerLine();
         hexSB.ensureCapacity(bytesPerLine * 3);
         rawSB.ensureCapacity(bytesPerLine);
 
@@ -291,6 +398,25 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
             graphics.setPaint(backgroundColor);
             graphics.fillRect(0, 0, width, height);
         }
+
+        // Ensure that we only paint items that are visible
+        int rowStart = 0;
+        int rowEnd   = numberOfLines - 1;
+
+        Rectangle clipBounds = graphics.getClipBounds();
+        if (clipBounds != null) {
+            rowStart = Math.max(rowStart, getRowAt(clipBounds.y));
+
+	        int row = getRowAt(clipBounds.y + clipBounds.height);
+	        if (row != -1)
+                rowEnd   = Math.min(rowEnd, row + 1);
+        }
+
+        checkState(rowStart >= 0);
+        checkState(rowStart <= rowEnd);
+        checkState(rowEnd >= 0);
+        checkState(rowEnd < numberOfLines);
+
 
         /*
         // Draw the caret/selection
@@ -307,23 +433,79 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
         }
         */
 
-        int lineHeight = averageCharacterSize.height;
-
-        // Draw the text
         graphics.setFont(font);
-        graphics.translate(0, margin.top + lineHeight);
+        graphics.translate(margin.left, marginTop + rowStart * lineHeight);
+
+        int charWidth  = averageCharacterSize.width;
 
         try {
+            long offset = rowStart * bytesPerLine;
+            for (;rowStart <= rowEnd; rowStart++) {
 
-            final long fileLength = file.length();
-            for (long offset = this.offset; offset < fileLength; offset += bytesPerLine) {
+                String line = buildLine(offset);
 
-                String line = buildLine(offset, bytesPerLine);
+                paintLine(graphics, line, false);
 
-                int x = margin.left;
-                graphics.translate(x, 0);
-                paintLine(graphics, line);
-                graphics.translate(-x, lineHeight);
+
+                // Selection is on this line
+                if (inSelectedRange(offset, bytesPerLine)) {
+                    /*
+                    // Determine the selected and unselected areas
+                    Area selection = textAreaSkin.getSelection();
+                    Area selectedArea = selection.createTransformedArea(AffineTransform.getTranslateInstance(-x, -y));
+                    Area unselectedArea = new Area();
+                    unselectedArea.add(new Area(new Rectangle2D.Float(0, 0, width, height)));
+                    unselectedArea.subtract(new Area(selectedArea));
+
+                    // Paint the unselected text
+                    Graphics2D unselectedGraphics = (Graphics2D)graphics.create();
+                    unselectedGraphics.clip(unselectedArea);
+                    paintLine(unselectedGraphics, line, false);
+                    unselectedGraphics.dispose();
+
+                    // Paint the selected text
+                    Graphics2D selectedGraphics = (Graphics2D)graphics.create();
+                    selectedGraphics.clip(selectedArea);
+                    paintLine(selectedGraphics, line, true);
+                    selectedGraphics.dispose();
+                    */
+                    paintLine(graphics, line, false);
+
+                    int startCol = 0, endCol = 16;
+                    long selectionEnd = selectionStart + selectionLength;
+                    if (selectionStart <= offset && selectionEnd >= offset + bytesPerLine) {
+                        // Full
+                        startCol = 0;
+                        endCol   = 16;
+                    } else {
+                        if (selectionStart >= offset) {
+                            // Starts on this line
+                            startCol = (int) (selectionStart % bytesPerLine);
+                        }
+                        if (selectionEnd < offset + bytesPerLine) {
+                            // Ends on this line
+                            endCol = (int) (selectionEnd % bytesPerLine);
+                        }
+                    }
+
+                    Shape oldClip = graphics.getClip();
+                    int clipX = addressWidth * averageCharacterSize.width +
+                            startCol * 3 * averageCharacterSize.width;
+
+                    int clipWidth = (endCol - startCol) * 3 * averageCharacterSize.width;
+
+                    int pad = 3;
+                    graphics.clipRect(clipX - pad,
+                            -fontAscent - pad,
+                            clipWidth - averageCharacterSize.width + 2 * pad,
+                            lineHeight + 2 * pad);
+
+                    paintLine(graphics, line, true);
+                    graphics.setClip(oldClip);
+                }
+
+                graphics.translate(0, lineHeight);
+                offset += bytesPerLine;
             }
 
         } catch (Throwable t) {
@@ -331,7 +513,10 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
         }
     }
 
-    private void paintLine(Graphics2D graphics, String line) {
+    long fileLength = 0;
+    int numberOfLines = 0;
+
+    private void paintLine(Graphics2D graphics, String line, boolean selected) {
 
         /*
         Font font = textAreaSkin.getFont();
@@ -343,7 +528,17 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
 
         //Rectangle clipBounds = graphics.getClipBounds();
         //Rectangle2D textBounds = row.glyphVector.getLogicalBounds();
-        graphics.setPaint(getColor());
+
+        FontMetrics fm = graphics.getFontMetrics();
+        Rectangle2D rect = fm.getStringBounds(line, graphics);
+
+        // TODO set clip here
+
+        graphics.setColor(selected ? getSelectionBackgroundColor() : getBackgroundColor());
+        //graphics.fillRect(0, 0 - fm.getAscent(), (int) rect.getWidth(), (int) rect.getHeight());
+        graphics.fillRect(0, -fontAscent, (int) rect.getWidth(), (int) rect.getHeight());
+
+        graphics.setPaint(selected ? getSelectionColor() : getColor());
         graphics.drawString(line, 0, 0);
 
     }
@@ -378,22 +573,29 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
         return font;
     }
 
+	protected void calculateFontBounds() {
+		int missingGlyphCode = font.getMissingGlyphCode();
+		FontRenderContext fontRenderContext = Platform.getFontRenderContext();
+
+		GlyphVector missingGlyphVector = font.createGlyphVector(fontRenderContext,
+				new int[] {missingGlyphCode});
+		Rectangle2D textBounds = missingGlyphVector.getLogicalBounds();
+
+		Rectangle2D maxCharBounds = font.getMaxCharBounds(fontRenderContext);
+		averageCharacterSize = new Dimensions(
+				(int)Math.ceil(textBounds.getWidth()),
+				(int)Math.ceil(maxCharBounds.getHeight())
+		);
+
+		lineHeight = averageCharacterSize.height;
+	}
+
     /**
      * Sets the font of the text
      */
     public void setFont(Font font) {
-        this.font = checkNotNull(font);;
-
-        int missingGlyphCode = font.getMissingGlyphCode();
-        FontRenderContext fontRenderContext = Platform.getFontRenderContext();
-
-        GlyphVector missingGlyphVector = font.createGlyphVector(fontRenderContext,
-                new int[] {missingGlyphCode});
-        Rectangle2D textBounds = missingGlyphVector.getLogicalBounds();
-
-        Rectangle2D maxCharBounds = font.getMaxCharBounds(fontRenderContext);
-        averageCharacterSize = new Dimensions((int)Math.ceil(textBounds.getWidth()),
-                (int)Math.ceil(maxCharBounds.getHeight()));
+        this.font = checkNotNull(font);
+	    calculateFontBounds();
 
         invalidateComponent();
     }
@@ -535,11 +737,7 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
      * Sets the amount of space between the edge of the TextArea and its text
      */
     public void setMargin(org.apache.pivot.wtk.Insets margin) {
-        if (margin == null) {
-            throw new IllegalArgumentException("margin is null.");
-        }
-
-        this.margin = margin;
+        this.margin = checkNotNull(margin);;
         invalidateComponent();
     }
 
@@ -548,10 +746,7 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
      * @param margin A dictionary with keys in the set {left, top, bottom, right}.
      */
     public final void setMargin(Dictionary<String, ?> margin) {
-        if (margin == null) {
-            throw new IllegalArgumentException("margin is null.");
-        }
-
+        checkNotNull(margin);
         setMargin(new org.apache.pivot.wtk.Insets(margin));
     }
 
@@ -566,10 +761,7 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
      * Sets the amount of space between the edge of the TextArea and its text
      */
     public final void setMargin(Number margin) {
-        if (margin == null) {
-            throw new IllegalArgumentException("margin is null.");
-        }
-
+        checkNotNull(margin);
         setMargin(margin.intValue());
     }
 
@@ -579,48 +771,43 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
      * left, top, bottom, and/or right.
      */
     public final void setMargin(String margin) {
-        if (margin == null) {
-            throw new IllegalArgumentException("margin is null.");
-        }
-
+        checkNotNull(margin);
         setMargin(org.apache.pivot.wtk.Insets.decode(margin));
     }
 
-/*
-    public int getBytesPerLine() {
-        return bytesPerLine;
-    }
-
-    public void setBytesPerLine(int bytesPerLine) {
-        Preconditions.checkArgument(bytesPerLine > 0);
-        if (this.bytesPerLine != bytesPerLine) {
-            this.bytesPerLine = bytesPerLine;
-            invalidateComponent();
-        }
-    }
-*/
-
     @Override
     public void fileChanged(HexEditor editor) {
-        Preconditions.checkState(editor == getComponent());
+        checkState(editor == getComponent());
 
         file = editor.getFile();
-        offset = 0;
+        //offset = 0;
 
-        invalidate();
         invalidateComponent();
     }
 
-    public void invalidate() {
+    public void invalidateComponent() {
+	    super.invalidateComponent();
 
+	    HexEditor editor = getHexEditor();
+	    editor.setMinimumWidth( getPreferredWidth(-1) );
     }
 
     @Override
     public void selectionChanged(HexEditor editor, long previousSelectionStart, long previousSelectionLength) {
-        Preconditions.checkState(editor == getComponent());
+        checkState(editor == getComponent());
 
-        invalidateComponent();
+        LongSpan span = editor.getSelection();
+        if (span == null) {
+            selectionLength = 0;
+        } else {
+            selectionStart  = span.start;
+            selectionLength = span.getLength();
+        }
+
+        // TODO repaint the effected lines only
+        repaintComponent();
     }
+
 
 /*
     @Override

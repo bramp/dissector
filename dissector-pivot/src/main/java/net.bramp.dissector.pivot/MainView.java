@@ -8,7 +8,10 @@ import org.apache.pivot.collections.Map;
 import org.apache.pivot.util.Resources;
 import org.apache.pivot.wtk.*;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -47,11 +50,21 @@ public class MainView extends Window implements Bindable {
         }
     }
 
+    public static ExtendedRandomAccessFile open(Class clazz, String filename) throws IOException {
+        try {
+            URI path = clazz.getResource(filename).toURI();
+            return new ExtendedRandomAccessFile( new File( path ), "r" );
+
+        } catch (URISyntaxException e) {
+            throw new IOException("Failed to open " + filename, e);
+        }
+    }
+
     @Override
     public void initialize(Map<String, Object> namespace, URL location, Resources resources) {
 
         try {
-            ExtendedRandomAccessFile in = new ExtendedRandomAccessFile( getClass().getResourceAsStream("z09n2c08.png") );
+            ExtendedRandomAccessFile in = open(getClass(), "z09n2c08.png");
             PngDissector dissector = new PngDissector().read(in);
 
             //treeView.setNodeRenderer();

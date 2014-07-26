@@ -3,6 +3,9 @@ package net.bramp.dissector.io;
 import java.io.*;
 
 /**
+ * Extends RandomAccessFile adding a few extra helpful methods
+ *
+ * TODO Consider replacing this with a MemoryMapped solution
  * @author bramp
  */
 public class ExtendedRandomAccessFile extends RandomAccessFile {

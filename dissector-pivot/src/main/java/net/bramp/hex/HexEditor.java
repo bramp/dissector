@@ -2,6 +2,7 @@ package net.bramp.hex;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.sun.istack.internal.Nullable;
 import org.apache.pivot.util.ListenerList;
 import org.apache.pivot.wtk.*;
 
@@ -11,6 +12,9 @@ import java.io.RandomAccessFile;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
+ * HexEditor component
+ * Note: Right now I think this will crash with files > 2GB
+ *
  * @author bramp
  */
 public class HexEditor extends Component {
@@ -23,20 +27,11 @@ public class HexEditor extends Component {
     /**
      * Length of the file
      */
-    long fileLength = 0;
+    private long fileLength = 0;
 
     private long selectionStart = 0;
     private long selectionLength = 0;
 
-    /**
-     * Total number of lines
-     */
-    private int lines = 1;
-
-    /**
-     * How many bytes to display per line
-     */
-    private int bytesPerLine = 16;
 
     final HexEditorContentListenerList contentListeners = new HexEditorContentListenerList();
     final HexEditorSelectionListenerList selectionListeners = new HexEditorSelectionListenerList();
@@ -45,7 +40,7 @@ public class HexEditor extends Component {
             implements HexEditorContentListener {
 
         @Override
-        public void fileChanged(HexEditor editor) {
+        public void fileChanged(HexEditor editor) throws IOException {
             for (HexEditorContentListener listener : this) {
                 listener.fileChanged(editor);
             }
@@ -65,7 +60,14 @@ public class HexEditor extends Component {
     }
 
     public interface Skin {
-        // TODO
+        /**
+         * Get the byte being displayed at the x/y coord
+         * -1 if no byte is at that location
+         * @param x x coord
+         * @param y y xoord
+         * @return
+         */
+        long getByteAt(int x, int y);
     }
 
     public HexEditor() {
@@ -81,9 +83,18 @@ public class HexEditor extends Component {
         super.setSkin(skin);
     }
 
-    public void setFile(RandomAccessFile file) {
+	public void setFile(RandomAccessFile file) throws IOException {
         this.file = file;
+        this.fileLength = file.length();
+
         contentListeners.fileChanged(this);
+    }
+
+    public @Nullable LongSpan getSelection() {
+        if (selectionLength == 0)
+            return null;
+
+        return new LongSpan(selectionStart, selectionStart + selectionLength - 1);
     }
 
     /**
@@ -109,6 +120,7 @@ public class HexEditor extends Component {
         }
     }
 
+    /*
     public void invalidate() {
         super.invalidate();
 
@@ -120,15 +132,10 @@ public class HexEditor extends Component {
             Throwables.propagate(e);
         }
     }
+    */
 
     public RandomAccessFile getFile() {
         return file;
-    }
-
-    public long getFileLength() { return fileLength; }
-
-    public int getBytesPerLine() {
-        return bytesPerLine;
     }
 
     public ListenerList<HexEditorContentListener> getContentListeners() {

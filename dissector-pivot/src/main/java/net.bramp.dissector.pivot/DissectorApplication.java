@@ -1,25 +1,23 @@
 package net.bramp.dissector.pivot;
 
-import net.bramp.hex.HexEditorWindow;
 import org.apache.pivot.beans.BXMLSerializer;
 import org.apache.pivot.collections.Map;
 import org.apache.pivot.wtk.Application;
 import org.apache.pivot.wtk.DesktopApplicationContext;
 import org.apache.pivot.wtk.Display;
+import org.apache.pivot.wtk.Window;
 
 /**
  * @author bramp
  */
 public class DissectorApplication implements Application {
-    private HexEditorWindow window = null;
+    private Window window = null;
 
     @Override
     public void startup(Display display, Map<String, String> properties) throws Exception {
         BXMLSerializer bxmlSerializer = new BXMLSerializer();
-        //window = (Window)bxmlSerializer.readObject(DissectorApplication.class, "application.xml");
-        window = (HexEditorWindow) bxmlSerializer.readObject(getClass().getResource("hexeditor.xml"));
-
-        window.open(display);
+	    window = (Window) bxmlSerializer.readObject(getClass().getResource("application.xml"));
+	    window.open(display);
     }
 
     @Override
