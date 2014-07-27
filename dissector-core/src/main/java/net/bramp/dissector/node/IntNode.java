@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * @author bramp
  */
-public class IntNode extends Node {
+public class IntNode extends Node<Long> {
 
     long value;
     byte radix = 10;
@@ -29,7 +29,7 @@ public class IntNode extends Node {
         return this;
     }
 
-    public long value() {
+    public Long value() {
         return value;
     }
 

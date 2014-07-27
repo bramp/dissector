@@ -9,25 +9,19 @@ import java.util.Map;
 /**
  * @author bramp
  */
-public class EnumNode extends Node {
+public class EnumNode<T> extends Node<T> {
 
-    final Map<Integer, String> values;
+    final Map<T, String> values;
 
-    int value;
+    T value;
 
-    public EnumNode(Map<Integer, String> values) {
+    public EnumNode(Map<T, String> values, Node<T> in) {
         this.values = values;
+	    super.setPos(in.getStart(), in.getEnd());
+	    this.value = in.value();
     }
 
-    public EnumNode read(ExtendedRandomAccessFile in, int length) throws IOException {
-        super.setPos(in, length);
-
-        value = in.readUnsignedIntOfLength(length);
-
-        return this;
-    }
-
-    public int value() {
+    public T value() {
         return value;
     }
 
@@ -36,10 +30,10 @@ public class EnumNode extends Node {
     }
 
     public String toString() {
-        return Long.toString(value) + " - " + name();
+        return value + " - " + name();
     }
 
-    public Map<Integer, String> getPossibleValues() {
+    public Map<T, String> getPossibleValues() {
         return ImmutableMap.copyOf(values);
     }
 }

@@ -1,17 +1,10 @@
 <app:DissectorWindow title="Dissector" maximized="true"
-        WindowStateListener.windowOpened="init();"
         xmlns:bxml="http://pivot.apache.org/bxml"
         xmlns:app="net.bramp.dissector.pivot"
         xmlns:hex="net.bramp.hex"
         xmlns="org.apache.pivot.wtk">
-    <bxml:script>
-        function init() {
-        orientation.setSelection(horizontalOrientationButton);
-        }
-    </bxml:script>
-
-    <SplitPane bxml:id="splitPane" orientation="horizontal">
-        <left minimumWidth="1000">
+    <SplitPane bxml:id="splitPane" orientation="horizontal" splitRatio="0.1">
+        <left>
             <Border>
                 <ScrollPane bxml:id="editorScrollPane"
                             horizontalScrollBarPolicy="fill"
@@ -23,40 +16,9 @@
         </left>
         <right>
             <Border>
-                <BoxPane orientation="vertical" styles="{padding:6, spacing:8, fill:true}">
-                    <bxml:define>
-                        <ButtonGroup bxml:id="orientation">
-                            <buttonGroupListeners>
-                                importClass(org.apache.pivot.wtk.Orientation);
-
-                                function selectionChanged(buttonGroup, previousSelection) {
-                                var selection = buttonGroup.getSelection();
-                                if (selection == horizontalOrientationButton) {
-                                splitPane.setOrientation(Orientation.HORIZONTAL);
-                                } else {
-                                splitPane.setOrientation(Orientation.VERTICAL);
-                                }
-                                }
-                            </buttonGroupListeners>
-                        </ButtonGroup>
-                    </bxml:define>
-
-                    <Label text="Orientation" styles="{font:{bold:true}}"/>
-                    <RadioButton bxml:id="horizontalOrientationButton"
-                                 buttonData="Horizontal" buttonGroup="$orientation"/>
-                    <RadioButton bxml:id="verticalOrientationButton"
-                                 buttonData="Vertical" buttonGroup="$orientation"/>
-
-                    <Separator/>
-
-                    <Checkbox buttonData="Use Shadow">
-                        <buttonStateListeners>
-                            function stateChanged(button, previousState) {
-                            splitPane.getStyles().put("useShadow", button.isSelected());
-                            }
-                        </buttonStateListeners>
-                    </Checkbox>
-                </BoxPane>
+                <ScrollPane horizontalScrollBarPolicy="fill_to_capacity">
+                    <TreeView bxml:id="treeView" />
+                </ScrollPane>
             </Border>
         </right>
     </SplitPane>

@@ -8,20 +8,25 @@ import java.io.IOException;
  * Skips some data
  * @author bramp
  */
-public class SkipNode extends Node {
+public class SkipNode extends Node<Void> {
 
-    long value;
+    long skipped;
 
     public SkipNode() {}
 
-    public SkipNode read(ExtendedRandomAccessFile in, long length) throws IOException {
+	public SkipNode read(ExtendedRandomAccessFile in, long length) throws IOException {
         super.setPos(in, length);
-        value = length;
+        skipped = length;
         in.skipBytes(length);
         return this;
     }
 
+	@Override
+	public Void value() {
+		return null;
+	}
+
     public String toString() {
-        return "{" + value + " bytes}";
+        return "{" + skipped + " bytes}";
     }
 }

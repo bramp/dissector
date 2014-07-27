@@ -278,7 +278,7 @@ public class PartitionEntryNode extends TreeNode {
         //addChild("skip", new FixedStringNode().read(in, 16) );
         addChild("status", new ByteNode().read(in).base(16) );
         addChild("first sector (chs)", new CHSAddressNode().read(in));
-        addChild("type", new EnumNode(partitionTypes).read(in, 1));
+        addChild("type", new EnumNode(partitionTypes, new ByteNode().read(in)));
         addChild("last sector (chs)", new CHSAddressNode().read(in));
 
         addChild("LBA first sector", new IntNode().read(in).base(16) );

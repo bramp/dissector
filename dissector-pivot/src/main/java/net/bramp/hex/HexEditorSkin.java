@@ -405,6 +405,7 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
 
         Rectangle clipBounds = graphics.getClipBounds();
         if (clipBounds != null) {
+	        // TODO Do we need to translate the clipBound to our Component? if so the -1 check below wouldn't be needed
             rowStart = Math.max(rowStart, getRowAt(clipBounds.y));
 
 	        int row = getRowAt(clipBounds.y + clipBounds.height);

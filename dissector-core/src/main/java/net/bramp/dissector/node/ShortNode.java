@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * @author bramp
  */
-public class ShortNode extends Node {
+public class ShortNode extends Node<Integer> {
 
     int value;
 
@@ -23,7 +23,7 @@ public class ShortNode extends Node {
         return this;
     }
 
-    public int value() {
+    public Integer value() {
         return value;
     }
 

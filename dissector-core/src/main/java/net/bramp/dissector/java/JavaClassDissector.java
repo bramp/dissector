@@ -23,6 +23,7 @@ public class JavaClassDissector extends Dissector {
         .put(49, "J2SE 5.0")
         .put(50, "J2SE 6.0")
         .put(51, "J2SE 7")
+		.put(52, "J2SE 8")
         .build();
 
     static final Map<Integer, String> accessFlags = ImmutableMap.<Integer, String>builder()
@@ -48,43 +49,58 @@ public class JavaClassDissector extends Dissector {
 
         addChild( "Magic", new IntNode().read(in, false).base(16) );
         addChild( "Minor", new ShortNode().read(in, false) );
-        addChild( "Major", new EnumNode(majorVersions).read(in, 2) );
+        addChild( "Major", new EnumNode(majorVersions, new ShortNode().read(in)) );
 
         len = addChild( "Constant pool count", new ShortNode().read(in, false) );
 
         ArrayNode constantPool = addChild( "Constant pool", new ArrayNode(1).read(in) );
         for (int i = 1; i < len.value(); i++) {
-            constantPool.addChild( new ConstantPoolNode().read(in) );
+	        ConstantPoolNode poolNode = new ConstantPoolNode().read(in);
+            constantPool.addChild( poolNode );
+
+	        // If the last type was a Long or a Double, we have to skip one tag
+	        if (poolNode.getType() == 5 || poolNode.getType() == 6) {
+		        constantPool.addChild(new NullNode().read(in));
+		        i++;
+	        }
         }
 
-        addChild( "Access flags", new MaskNode(accessFlags).read(in, 2) );
+        addChild( "Access flags", new MaskNode(accessFlags, new ShortNode().read(in)) );
         addChild( "This index",   new ShortNode().read(in, false) );
         addChild( "Super index",  new ShortNode().read(in, false) );
 
         len = addChild( "Interface count", new ShortNode().read(in, false) );
 
-        ArrayNode interfaces = addChild( "Interfaces", new ArrayNode().read(in) );
-        for (int i = 0; i < len.value(); i++) {
-            interfaces.addChild( new ShortNode().read(in) );
-        }
+	    if (len.value() > 0) {
+		    ArrayNode interfaces = addChild("Interfaces", new ArrayNode().read(in));
+		    for (int i = 0; i < len.value(); i++) {
+			    interfaces.addChild(new ShortNode().read(in));
+		    }
+	    }
 
         len = addChild( "Field count", new ShortNode().read(in, false) );
-        ArrayNode fields = addChild( "Fields", new ArrayNode().read(in) );
-        for (int i = 0; i < len.value(); i++) {
-            fields.addChild( new FieldInfoNode().read(in) );
-        }
+	    if (len.value() > 0) {
+		    ArrayNode fields = addChild("Fields", new ArrayNode().read(in));
+		    for (int i = 0; i < len.value(); i++) {
+			    fields.addChild(new FieldInfoNode().read(in));
+		    }
+	    }
 
         len = addChild( "Method count", new ShortNode().read(in, false) );
-        ArrayNode methods = addChild( "Methods", new ArrayNode().read(in) );
-        for (int i = 0; i < len.value(); i++) {
-            methods.addChild( new MethodInfoNode().read(in) );
-        }
+	    if (len.value() > 0) {
+		    ArrayNode methods = addChild("Methods", new ArrayNode().read(in));
+		    for (int i = 0; i < len.value(); i++) {
+			    methods.addChild(new MethodInfoNode().read(in));
+		    }
+	    }
 
         len = addChild( "Attribute count", new ShortNode().read(in, false) );
-        ArrayNode attributes = addChild( "Attributes", new ArrayNode().read(in) );
-        for (int i = 0; i < len.value(); i++) {
-            attributes.addChild( new AttributeInfoNode().read(in) );
-        }
+	    if (len.value() > 0) {
+		    ArrayNode attributes = addChild("Attributes", new ArrayNode().read(in));
+		    for (int i = 0; i < len.value(); i++) {
+			    attributes.addChild(new AttributeInfoNode().read(in));
+		    }
+	    }
 
         return this;
     }

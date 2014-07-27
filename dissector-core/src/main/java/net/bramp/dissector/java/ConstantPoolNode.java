@@ -12,29 +12,36 @@ import java.util.Map;
  */
 public class ConstantPoolNode extends TreeNode {
 
-    static final Map<Integer, String> constantTypes = ImmutableMap.<Integer, String>builder()
-        .put(1, "Utf8")
-        .put(3, "Integer")
-        .put(4, "Float")
-        .put(5, "Long")
-        .put(6, "Double")
-        .put(7, "Class")
-        .put(8, "String")
-        .put(9, "Fieldref")
-        .put(10, "Methodref")
-        .put(11, "InterfaceMethodref")
-        .put(12, "NameAndType")
+    static final Map<Short, String> constantTypes = ImmutableMap.<Short, String>builder()
+        .put((short) 1, "Utf8")
+        .put((short) 3, "Integer")
+        .put((short) 4, "Float")
+        .put((short) 5, "Long")
+        .put((short) 6, "Double")
+        .put((short) 7, "Class")
+        .put((short) 8, "String")
+        .put((short) 9, "Fieldref")
+        .put((short) 10, "Methodref")
+        .put((short) 11, "InterfaceMethodref")
+        .put((short) 12, "NameAndType")
+		//
+		.put((short) 15, "MethodHandle")
+		.put((short) 16, "MethodType")
+		.put((short) 18, "InvokeDynamic")
         .build();
 
-    public ConstantPoolNode() {}
+	private short type;
+
+	public ConstantPoolNode() {}
 
     public ConstantPoolNode read(ExtendedRandomAccessFile in) throws IOException {
         super.read(in);
 
-        EnumNode type = addChild( "tag", new EnumNode(constantTypes).read(in, 1) );
-        //setTitle( type.name() );
+        EnumNode<Short> type = addChild( "tag", new EnumNode<Short>(constantTypes, new ByteNode().read(in) ) );
+        setTitle( type.name() );
 
-        switch (type.value()) {
+	    this.type = type.value();
+        switch (this.type) {
             case 7:
                 addChild( "name_index", new ShortNode().read(in) );
                 break;
@@ -66,16 +73,20 @@ public class ConstantPoolNode extends TreeNode {
                 addChild( "descriptor_index", new ShortNode().read(in) );
                 break;
 
-            case 1: // String
+            case 1: // String (UTF-8)
                 ShortNode len = addChild( "length", new ShortNode().read(in) );
                 addChild( "bytes", new FixedStringNode().read(in, len.value()) );
                 break;
 
             default:
-                // We can't continue parsing as constant types are variable length
-                throw new IOException("Unknown Constant Pool Type");
+                // If we don't know it we can't continue parsing as constant types are variable length
+                throw new IOException("Unknown Constant Pool Type: " + type.value());
         }
 
         return this;
     }
+
+	public short getType() {
+		return type;
+	}
 }

@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -12,6 +13,8 @@ import java.nio.charset.Charset;
  * @author bramp
  */
 public class FixedStringNode extends Node {
+
+	final static int MAX_DISPLAY_WIDTH = 50;
 
     Charset charset = Charsets.UTF_8;
     String value;
@@ -45,6 +48,6 @@ public class FixedStringNode extends Node {
 
     public String toString() {
         // Replace some characters to make them printable
-        return StringEscapeUtils.escapeJava(value);
+        return StringUtils.abbreviate( StringEscapeUtils.escapeJava(value), MAX_DISPLAY_WIDTH );
     }
 }

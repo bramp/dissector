@@ -12,7 +12,7 @@ public class FieldInfoNode extends TreeNode {
 
     public FieldInfoNode read(ExtendedRandomAccessFile in) throws IOException {
 
-        addChild( "access_flags", new MaskNode(JavaClassDissector.accessFlags).read(in, 2) );
+        addChild( "access_flags", new MaskNode(JavaClassDissector.accessFlags, new ShortNode().read(in)) );
         addChild( "name_index", new ShortNode().read(in) );
         addChild( "descriptor_index", new ShortNode().read(in) );
 

@@ -7,14 +7,14 @@ import java.io.IOException;
 /**
  * @author bramp
  */
-public class ByteNode extends Node {
+public class ByteNode extends Node<Short> {
 
     short value;
     byte radix = 10;
 
     public ByteNode() {}
 
-    public ByteNode read(ExtendedRandomAccessFile in) throws IOException {
+	public ByteNode read(ExtendedRandomAccessFile in) throws IOException {
         return this.read(in, false);
     }
 
@@ -35,4 +35,8 @@ public class ByteNode extends Node {
         return Long.toString(value, radix);
     }
 
+	@Override
+	public Short value() {
+		return value;
+	}
 }

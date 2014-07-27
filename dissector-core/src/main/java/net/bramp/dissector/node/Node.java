@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * @author bramp
  */
-public class Node implements Comparable<Node> {
+public abstract class Node<T> implements Comparable<Node> {
     public long start;
     public long end;
 
@@ -51,4 +51,6 @@ public class Node implements Comparable<Node> {
         Preconditions.checkNotNull(o);
         return Long.compare(start, o.start);
     }
+
+	public abstract T value();
 }

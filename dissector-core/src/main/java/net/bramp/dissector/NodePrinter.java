@@ -23,7 +23,7 @@ public class NodePrinter {
 
     public void print(Node node, int depth) {
         if (node instanceof TreeNode) {
-            for(Map.Entry<String, Node> m : ((TreeNode)node).getChildren()) {
+            for(Map.Entry<String, Node> m : ((TreeNode)node).getChildren().entrySet() ) {
                 out.print(Strings.repeat("  ", depth) + m.getKey() + " : ");
                 if (m.getValue() instanceof TreeNode)
                     out.println();

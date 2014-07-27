@@ -7,34 +7,29 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
+ * Note only works up to 63 bits
  * @author bramp
  */
-public class MaskNode extends Node {
+public class MaskNode<T extends Number> extends Node<Long> {
 
-    final Map<Integer, String> values;
+    final Map<T, String> values;
 
-    int value;
+    long value;
 
-    public MaskNode(Map<Integer, String> values) {
-        this.values = values;
-    }
+	public MaskNode(Map<T, String> values, Node<T> in) {
+		this.values = values;
+		super.setPos(in.getStart(), in.getEnd());
+		this.value = in.value().longValue();
+	}
 
-    public MaskNode read(ExtendedRandomAccessFile in, int length) throws IOException {
-        super.setPos(in, length);
-
-        value = in.readUnsignedIntOfLength(length);
-
-        return this;
-    }
-
-    public int value() {
+    public Long value() {
         return value;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<Integer, String> bit : values.entrySet()) {
-            int b = bit.getKey();
+        for (Map.Entry<T, String> bit : values.entrySet()) {
+	        long b = bit.getKey().longValue();
             if ((b & value) == b) {
                 sb.append(bit.getValue()).append("|");
             }
@@ -47,7 +42,7 @@ public class MaskNode extends Node {
         return sb.toString();
     }
 
-    public Map<Integer, String> getPossibleValues() {
+    public Map<T, String> getPossibleValues() {
         return ImmutableMap.copyOf(values);
     }
 }

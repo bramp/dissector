@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * @author bramp
  */
-public class FloatNode extends Node {
+public class FloatNode extends Node<Float> {
 
     float value;
 
@@ -19,7 +19,7 @@ public class FloatNode extends Node {
         return this;
     }
 
-    public float value() {
+    public Float value() {
         return value;
     }
 
