@@ -24,8 +24,17 @@ public class ExtendedRandomAccessFile extends RandomAccessFile {
      * @throws IOException
      */
     public int readUnsigned3Int() throws IOException {
-        throw new RuntimeException("Not implemented");
+	    return (readUnsignedByte() << 24) | (readUnsignedByte() << 16) | readUnsignedByte();
     }
+
+	/**
+	 * Read a three byte int
+	 * @return
+	 * @throws IOException
+	 */
+	public int read3Int() throws IOException {
+		throw new RuntimeException("Not implemented");
+	}
 
     /**
      *
@@ -42,7 +51,7 @@ public class ExtendedRandomAccessFile extends RandomAccessFile {
      * @return
      * @throws IOException
      */
-    public int readUnsignedIntOfLength(int length) throws IOException {
+    public long readUnsignedIntOfLength(int length) throws IOException {
         if (length == 1)
             return readUnsignedByte();
         else if (length == 2)
@@ -50,10 +59,29 @@ public class ExtendedRandomAccessFile extends RandomAccessFile {
         else if (length == 3)
             return readUnsigned3Int();
         else if (length == 4)
-            return (int)readUnsignedInt();
+            return readUnsignedInt();
         else
-            throw new IllegalArgumentException("Invalid value for length");
+	        throw new IllegalArgumentException("Invalid value for length " + length);
     }
+
+	/**
+	 * Signed int of length
+	 * @param length
+	 * @return
+	 * @throws IOException
+	 */
+	public int readIntOfLength(int length) throws IOException {
+		if (length == 1)
+			return readByte();
+		else if (length == 2)
+			return readShort();
+		else if (length == 3)
+			return read3Int();
+		else if (length == 4)
+			return readInt();
+		else
+			throw new IllegalArgumentException("Invalid value for length " + length);
+	}
 
     public void skipBytes(long length) throws IOException {
         // The standard Java RandomAccessFile.skipBytes doesn't support skip with a long!

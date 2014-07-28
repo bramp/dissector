@@ -10,14 +10,14 @@
                             horizontalScrollBarPolicy="fill"
                             verticalScrollBarPolicy="always"
                             preferredHeight="240">
-                    <hex:HexEditor bxml:id="editor" styles="{font:'courier', margin: 10}"/>
+                    <hex:HexEditor bxml:id="editor" styles="{font:'courier 16', margin: 10}"/>
                 </ScrollPane>
             </Border>
         </left>
         <right>
             <Border>
                 <ScrollPane horizontalScrollBarPolicy="fill_to_capacity">
-                    <TreeView bxml:id="treeView" />
+                    <TreeView bxml:id="treeView" styles="{font:'courier 16', margin: 10}" />
                 </ScrollPane>
             </Border>
         </right>

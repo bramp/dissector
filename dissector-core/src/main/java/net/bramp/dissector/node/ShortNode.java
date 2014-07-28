@@ -10,6 +10,7 @@ import java.io.IOException;
 public class ShortNode extends Node<Integer> {
 
     int value;
+	byte radix = 10;
 
     public ShortNode() {}
 
@@ -23,11 +24,18 @@ public class ShortNode extends Node<Integer> {
         return this;
     }
 
+	public ShortNode base(int radix) {
+		this.radix = (byte)radix;
+		return this;
+	}
+
     public Integer value() {
         return value;
     }
 
     public String toString() {
-        return Integer.toString(value);
+	    if (radix == 16)
+		    return "0x" + Integer.toString(value, radix).toUpperCase();
+        return Integer.toString(value, radix);
     }
 }

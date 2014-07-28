@@ -9,6 +9,10 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
 
     <modules>
         <module>dissector-core</module>
@@ -27,11 +31,28 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.1</version>
             </dependency>
+            <dependency>
+                <groupId>io.fastjson</groupId>
+                <artifactId>boon</artifactId>
+                <version>0.23</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.4</version>
+            </dependency>
 
+            <!-- Testing -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.11</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>0.9.9-RC2</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

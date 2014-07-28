@@ -156,4 +156,16 @@ public class OrderPreservingMap<K,V> implements Map<K,V> {
     public Set<Entry<K, V>> entrySet() {
         return ImmutableSet.copyOf(entries);
     }
+
+	public V firstValue() {
+		if (entries.isEmpty())
+			throw new IndexOutOfBoundsException();
+		return entries.get(0).getValue();
+	}
+
+	public V lastValue() {
+		if (entries.isEmpty())
+			throw new IndexOutOfBoundsException();
+		return entries.get(entries.size() - 1).getValue();
+	}
 }

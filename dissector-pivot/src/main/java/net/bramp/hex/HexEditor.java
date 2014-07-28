@@ -1,11 +1,10 @@
 package net.bramp.hex;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
-import com.sun.istack.internal.Nullable;
 import org.apache.pivot.util.ListenerList;
 import org.apache.pivot.wtk.*;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 

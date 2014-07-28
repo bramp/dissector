@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import net.bramp.dissector.io.ExtendedRandomAccessFile;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -15,6 +16,10 @@ public class MaskNode<T extends Number> extends Node<Long> {
     final Map<T, String> values;
 
     long value;
+
+	public MaskNode(Node<T> in) {
+		this(Collections.EMPTY_MAP, in);
+	}
 
 	public MaskNode(Map<T, String> values, Node<T> in) {
 		this.values = values;

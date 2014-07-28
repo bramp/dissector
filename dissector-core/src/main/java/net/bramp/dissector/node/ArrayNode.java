@@ -13,6 +13,10 @@ public class ArrayNode extends TreeNode {
 
     public ArrayNode() {}
 
+	/**
+	 *
+	 * @param startOffset Index this array starts at, defaults to zero
+	 */
     public ArrayNode(int startOffset) {
         this.startOffset = startOffset;
     }

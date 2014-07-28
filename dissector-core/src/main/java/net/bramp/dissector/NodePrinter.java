@@ -25,10 +25,14 @@ public class NodePrinter {
         if (node instanceof TreeNode) {
             for(Map.Entry<String, Node> m : ((TreeNode)node).getChildren().entrySet() ) {
                 out.print(Strings.repeat("  ", depth) + m.getKey() + " : ");
+
                 if (m.getValue() instanceof TreeNode)
-                    out.println();
+                    out.println(((TreeNode) m.getValue()).getTitle());
+
                 print(m.getValue(), depth + 1);
-                out.println();
+
+	            if (!(m.getValue() instanceof TreeNode))
+                    out.println();
             }
         } else {
             out.print(node.toString());

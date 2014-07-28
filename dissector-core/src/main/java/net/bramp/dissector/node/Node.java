@@ -21,7 +21,7 @@ public abstract class Node<T> implements Comparable<Node> {
     }
 
     protected Node setPos(ExtendedRandomAccessFile in, long length) throws IOException {
-        Preconditions.checkArgument(length >= 0 && length <= Integer.MAX_VALUE);
+        Preconditions.checkArgument(length >= 0 && length <= Integer.MAX_VALUE, "Illegal length value " + length);
         this.start = in.getFilePointer();
         this.end   = start + length;
         return this;
@@ -53,4 +53,8 @@ public abstract class Node<T> implements Comparable<Node> {
     }
 
 	public abstract T value();
+
+	public long length() {
+		return getEnd() - getStart();
+	}
 }

@@ -16,21 +16,23 @@ import java.util.Set;
 public class TreeNode extends Node<Map<String, Node>> {
 
 	String title = "";
-    Map<String, Node> children = new OrderPreservingMap<>();
+	final OrderPreservingMap<String, Node> children = new OrderPreservingMap<>();
 
     public TreeNode() {
         super();
-	    this.start = Long.MAX_VALUE;
-	    this.end   = 0;
+	    this.start = -1;
+	    this.end   = -1;
     }
 
 	public <T extends Node> T addChild(String title, T node) {
-        Preconditions.checkArgument(node.getStart() >= 0);
-        Preconditions.checkArgument(node.getEnd() >= node.getStart());
-
+		// Preconditions.checkArgument(node.getStart() >= 0);
+		// Preconditions.checkArgument(node.getEnd() >= node.getStart());
+		// this.start = Math.min(this.start, node.start);
+		// this.end   = Math.max(this.end,   node.end);
         children.put(title, node);
-        this.start = Math.min(this.start, node.start);
-        this.end   = Math.max(this.end,   node.end);
+
+		this.start = -1;
+
         return node;
     }
 
@@ -58,5 +60,24 @@ public class TreeNode extends Node<Map<String, Node>> {
 
 	public String toString() {
 		return getTitle();
+	}
+
+	protected void calcStartEnd() {
+		if (start == -1) {
+			start = children.firstValue().getStart();
+			end = children.lastValue().getEnd();
+		}
+	}
+
+	@Override
+	public long getEnd() {
+		calcStartEnd();
+		return super.getEnd();
+	}
+
+	@Override
+	public long getStart() {
+		calcStartEnd();
+		return super.getStart();
 	}
 }

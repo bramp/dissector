@@ -309,14 +309,9 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
     private boolean inSelectedRange(long offset, int length) {
         long offsetEnd = offset + length;
         long selectionEnd = selectionStart + selectionLength;
-        /*
-        return selectionLength > 0 &&
-                ((selectionStart >= offset && selectionStart <= offsetEnd) ||
-                (selectionEnd >= offset && selectionEnd <= offsetEnd));
-        */
 
         return selectionLength > 0 &&
-                (selectionStart <= offset + length && selectionEnd >= offset);
+                (selectionStart < offset + length && selectionEnd >= offset);
     }
 
     /**
@@ -450,26 +445,7 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
 
                 // Selection is on this line
                 if (inSelectedRange(offset, bytesPerLine)) {
-                    /*
-                    // Determine the selected and unselected areas
-                    Area selection = textAreaSkin.getSelection();
-                    Area selectedArea = selection.createTransformedArea(AffineTransform.getTranslateInstance(-x, -y));
-                    Area unselectedArea = new Area();
-                    unselectedArea.add(new Area(new Rectangle2D.Float(0, 0, width, height)));
-                    unselectedArea.subtract(new Area(selectedArea));
 
-                    // Paint the unselected text
-                    Graphics2D unselectedGraphics = (Graphics2D)graphics.create();
-                    unselectedGraphics.clip(unselectedArea);
-                    paintLine(unselectedGraphics, line, false);
-                    unselectedGraphics.dispose();
-
-                    // Paint the selected text
-                    Graphics2D selectedGraphics = (Graphics2D)graphics.create();
-                    selectedGraphics.clip(selectedArea);
-                    paintLine(selectedGraphics, line, true);
-                    selectedGraphics.dispose();
-                    */
                     paintLine(graphics, line, false);
 
                     int startCol = 0, endCol = 16;

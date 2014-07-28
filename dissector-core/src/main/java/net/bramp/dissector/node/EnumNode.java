@@ -13,27 +13,36 @@ public class EnumNode<T> extends Node<T> {
 
     final Map<T, String> values;
 
-    T value;
+	Node<T> in;
 
     public EnumNode(Map<T, String> values, Node<T> in) {
         this.values = values;
-	    super.setPos(in.getStart(), in.getEnd());
-	    this.value = in.value();
+	    this.in = in;
     }
 
     public T value() {
-        return value;
+        return in.value();
     }
 
     public String name() {
-        return values.containsKey(value) ? values.get(value) : "unknown";
+        return values.containsKey(in.value()) ? values.get(in.value()) : "unknown";
     }
 
     public String toString() {
-        return value + " - " + name();
+        return in.value() + " - " + name();
     }
 
     public Map<T, String> getPossibleValues() {
         return ImmutableMap.copyOf(values);
     }
+
+	@Override
+	public long getEnd() {
+		return in.getEnd();
+	}
+
+	@Override
+	public long getStart() {
+		return in.getStart();
+	}
 }
