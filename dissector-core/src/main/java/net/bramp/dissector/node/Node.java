@@ -14,20 +14,20 @@ public abstract class Node<T> implements Comparable<Node> {
 
     public Node() {}
 
-    protected Node setPos(ExtendedRandomAccessFile in) throws IOException {
+	public Node setPos(ExtendedRandomAccessFile in) throws IOException {
         this.start = in.getFilePointer();
         this.end   = -1;
         return this;
     }
 
-    protected Node setPos(ExtendedRandomAccessFile in, long length) throws IOException {
+	public Node setPos(ExtendedRandomAccessFile in, long length) throws IOException {
         Preconditions.checkArgument(length >= 0 && length <= Integer.MAX_VALUE, "Illegal length value " + length);
         this.start = in.getFilePointer();
         this.end   = start + length;
         return this;
     }
 
-    protected Node setPos(long start, long end) {
+    public Node setPos(long start, long end) {
         this.start = start;
         this.end   = end;
         return this;
@@ -57,4 +57,5 @@ public abstract class Node<T> implements Comparable<Node> {
 	public long length() {
 		return getEnd() - getStart();
 	}
+
 }

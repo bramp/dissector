@@ -56,8 +56,9 @@ public class DissectorWindow extends Window implements Bindable {
 			    TreeNode treeNode = (TreeNode) treeView.getSelectedNode();
 			    java.util.Map.Entry<String, Node> selected = (java.util.Map.Entry<String, Node>) treeNode.getUserData();
 			    Node node = selected.getValue();
+
+			    //System.out.println( node.getStart() + " " + (node.getEnd() - node.getStart()) + " " + node );
 			    editor.setSelection( node.getStart(), node.getEnd() - node.getStart() );
-			    System.out.println( node.getStart() + " " + (node.getEnd() - node.getStart()) );
 		    }
 
 	    });

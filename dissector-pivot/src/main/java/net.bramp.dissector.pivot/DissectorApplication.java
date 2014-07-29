@@ -6,6 +6,7 @@ import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import net.bramp.dissector.iso.IsoDissector;
 import net.bramp.dissector.java.JavaClassDissector;
 import net.bramp.dissector.png.PngDissector;
+import net.bramp.dissector.torrent.TorrentDissector;
 import org.apache.pivot.beans.BXMLSerializer;
 import org.apache.pivot.collections.Map;
 import org.apache.pivot.wtk.Application;
@@ -32,12 +33,14 @@ public class DissectorApplication implements Application {
 
 	    //String filename = "/home/bramp/personal/dissector/dissector-core/src/test/resources/net/bramp/dissector/png/z00n2c08.png";
 	    //String filename = "/home/bramp/personal/dissector/dissector-core/target/classes/net/bramp/dissector/java/JavaClassDissector.class";
-	    String filename = "/home/bramp/Downloads/6th_and_Lane_480_RK2 RF22 F24 A32 H240.mp4";
+	    //String filename = "/home/bramp/src/transcoder/samples/lane_bryant/6th_and_Lane_480_RK2 RF22 F24 A32 H240.mp4";
+	    String filename = "/home/bramp/personal/dissector/dissector-core/src/test/resources/net/bramp/dissector/torrent/KNOPPIX 7.2.0 DVD.torrent";
 	    ExtendedRandomAccessFile file = new ExtendedRandomAccessFile(filename, "r");
 
 	    //window.loadDissector(file, new PngDissector());
 	    //window.loadDissector(file, new JavaClassDissector());
-	    window.loadDissector(file, new IsoDissector());
+	    //window.loadDissector(file, new IsoDissector());
+	    window.loadDissector(file, new TorrentDissector());
 
     }
 

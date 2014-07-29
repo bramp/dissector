@@ -83,8 +83,30 @@ public class ExtendedRandomAccessFile extends RandomAccessFile {
 			throw new IllegalArgumentException("Invalid value for length " + length);
 	}
 
-    public void skipBytes(long length) throws IOException {
-        // The standard Java RandomAccessFile.skipBytes doesn't support skip with a long!
-        this.seek( this.getFilePointer() + length );
-    }
+	/**
+	 * Peeks the next byte
+	 * @return
+	 */
+	public int peek() throws IOException {
+		long pos = getFilePointer();
+		try {
+			return read();
+		} finally {
+			seek(pos);
+		}
+	}
+
+
+	public void skipBytes(long length) throws IOException {
+		// The standard Java RandomAccessFile.skipBytes doesn't support skip with a long!
+		this.seek( this.getFilePointer() + length );
+	}
+
+	/**
+	 * Rewinds the file by i bytes
+	 * @param i
+	 */
+	public void rewind(long i) throws IOException {
+		this.seek( this.getFilePointer() - i );
+	}
 }

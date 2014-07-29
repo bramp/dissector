@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
 /**
  * @author bramp
  */
-public class FixedStringNode extends Node {
+public class FixedStringNode extends Node<String> {
 
 	final static int MAX_DISPLAY_WIDTH = 50;
 

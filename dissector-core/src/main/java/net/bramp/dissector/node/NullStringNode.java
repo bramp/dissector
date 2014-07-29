@@ -18,10 +18,24 @@ public class NullStringNode extends Node {
 
 	final static int MAX_DISPLAY_WIDTH = 50;
 
-    Charset charset = Charsets.UTF_8;
+	final int terminator;
+	final boolean swallowTerminator;
+
+	Charset charset = Charsets.UTF_8;
     String value;
 
-    public NullStringNode() {}
+    public NullStringNode() {
+	    this(0);
+    }
+
+	public NullStringNode(int terminator) {
+		this(terminator, true);
+	}
+
+	public NullStringNode(int terminator, boolean swallowTerminator) {
+		this.terminator = terminator;
+		this.swallowTerminator = swallowTerminator;
+	}
 
 	public NullStringNode read(ExtendedRandomAccessFile in) throws IOException {
 		return this.read(in, Long.MAX_VALUE, charset);
@@ -34,8 +48,6 @@ public class NullStringNode extends Node {
     public String value() {
         return value;
     }
-
-	private final int TERMINATOR = 0;
 
     /**
      * @param in
@@ -52,15 +64,22 @@ public class NullStringNode extends Node {
 	    int b = 0;
 	    while (maxLength > 0) {
 		    b = in.read();
-		    if (b == -1 || b == TERMINATOR)
+		    if (b == -1)
+		        break;
+
+		    if (b == terminator) {
+			    if (!swallowTerminator) {
+				    in.rewind(1);
+			    }
 			    break;
+		    }
 
 			buf.addByte( b );
 		    maxLength--;
 	    }
 
 	    value = new String(buf.toBytes() , charset);
-	    end = start + buf.len() + 1;
+	    end = in.getFilePointer();
 
         return this;
     }

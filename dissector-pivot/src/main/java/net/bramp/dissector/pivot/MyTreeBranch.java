@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import net.bramp.dissector.node.Node;
 import net.bramp.dissector.node.TreeNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pivot.collections.Sequence;
 import org.apache.pivot.wtk.content.TreeBranch;
 
@@ -14,6 +15,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.commons.lang3.StringUtils.abbreviate;
 
 /**
  * Wraps the Dissector Nodes in Pivot TreeBranch/TreeNodes
@@ -21,6 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author bramp
  */
 public class MyTreeBranch extends TreeBranch {
+
+	final static int MAX_KEY_WIDTH = 32;
+	final static int MAX_VAL_WIDTH = 64;
 
 	final net.bramp.dissector.node.TreeNode root;
 	final ImmutableList<Map.Entry<String, Node>> children;
@@ -32,11 +37,10 @@ public class MyTreeBranch extends TreeBranch {
 			Node value = input.getValue();
 			org.apache.pivot.wtk.content.TreeNode node;
 
+			String text = abbreviate(input.getKey(), MAX_KEY_WIDTH) + ": " + abbreviate(value.toString(), MAX_VAL_WIDTH);
 			if (value instanceof TreeNode) {
-				TreeNode treeNode = (TreeNode) value;
-				node = new MyTreeBranch(treeNode, input.getKey() + " " + treeNode.toString());
+				node = new MyTreeBranch((TreeNode) value, text);
 			} else {
-				String text = input.getKey() + ": " + value.toString();
 				node = new org.apache.pivot.wtk.content.TreeNode(text);
 			}
 
