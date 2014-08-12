@@ -1,6 +1,7 @@
 package net.bramp.hex;
 
 import com.google.common.base.Throwables;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import org.apache.pivot.collections.Dictionary;
 import org.apache.pivot.wtk.*;
 import org.apache.pivot.wtk.Insets;
@@ -126,7 +127,7 @@ public class HexEditorSkin extends ComponentSkin implements HexEditor.Skin, HexE
     private static final int addressWidth = 9; // In characters 8 + 1 space
     private static final int SCROLL_RATE = 30;
 
-    private RandomAccessFile file;
+    private ExtendedRandomAccessFile file;
 
     /**
      * Total number of lines

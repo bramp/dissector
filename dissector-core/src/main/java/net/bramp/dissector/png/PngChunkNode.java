@@ -55,8 +55,8 @@ public class PngChunkNode extends TreeNode {
     public PngChunkNode() {}
 
     public PngChunkNode read(ExtendedRandomAccessFile in) throws IOException {
-        IntNode length = new IntNode().read(in, false);
-        EnumNode<String> type  = new EnumNode<String>(chunkTypes, new FixedStringNode().read(in, 4, Charsets.US_ASCII));
+        IntNode length = new IntNode().read(in);
+        EnumNode<String> type  = new EnumNode<String>(chunkTypes, new FixedStringNode(4, Charsets.US_ASCII).read(in));
 
         addChild("Length", length);
         addChild("Type",   type);
@@ -67,7 +67,7 @@ public class PngChunkNode extends TreeNode {
             default     : readUnknown(in, length.value());
         }
 
-        addChild("CRC", new IntNode().base(16).read(in, false)); // TODO Validate
+        addChild("CRC", new IntNode().base(16).read(in)); // TODO Validate
 
 	    setTitle( type.name() + " (" + length.value() + " bytes)" );
 
@@ -79,9 +79,9 @@ public class PngChunkNode extends TreeNode {
     }
 
     protected void readIHDR(ExtendedRandomAccessFile in) throws IOException {
-        addChild("Width", new IntNode().read(in, false) );
-        addChild("Height", new IntNode().read(in, false) );
-        addChild("Bit depth", new ByteNode().read(in, false) );
+        addChild("Width", new IntNode().read(in) );
+        addChild("Height", new IntNode().read(in) );
+        addChild("Bit depth", new ByteNode().read(in) );
         addChild("Colour type", new EnumNode(colourTypes, new ByteNode().read(in, false) ));
         addChild("Compression", new EnumNode(compressionTypes, new ByteNode().read(in, false) ));
         addChild("Filter method", new EnumNode(filterTypes, new ByteNode().read(in, false) ));

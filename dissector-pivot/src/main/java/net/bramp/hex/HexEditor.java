@@ -1,6 +1,7 @@
 package net.bramp.hex;
 
 import com.google.common.base.Preconditions;
+import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import org.apache.pivot.util.ListenerList;
 import org.apache.pivot.wtk.*;
 
@@ -21,7 +22,7 @@ public class HexEditor extends Component {
     /**
      * The file
      */
-    RandomAccessFile file;
+    ExtendedRandomAccessFile file;
 
     /**
      * Length of the file
@@ -82,7 +83,7 @@ public class HexEditor extends Component {
         super.setSkin(skin);
     }
 
-	public void setFile(RandomAccessFile file) throws IOException {
+	public void setFile(ExtendedRandomAccessFile file) throws IOException {
         this.file = file;
         this.fileLength = file.length();
 
@@ -133,7 +134,7 @@ public class HexEditor extends Component {
     }
     */
 
-    public RandomAccessFile getFile() {
+    public ExtendedRandomAccessFile getFile() {
         return file;
     }
 

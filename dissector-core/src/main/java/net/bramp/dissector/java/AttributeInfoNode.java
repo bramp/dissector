@@ -19,7 +19,7 @@ public class AttributeInfoNode extends TreeNode {
         addChild( "name_index", new ShortNode().read(in) );
 
         IntNode len = addChild( "length", new IntNode().read(in) );
-        addChild( "info", new FixedStringNode().read(in, len.value()) );
+        addChild( "info", new FixedStringNode(len).read(in) );
 
         return this;
     }

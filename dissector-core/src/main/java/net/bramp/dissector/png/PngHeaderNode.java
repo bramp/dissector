@@ -17,8 +17,8 @@ public class PngHeaderNode extends TreeNode {
     public PngHeaderNode read(ExtendedRandomAccessFile in) throws IOException {
 
         addChild("0x89", new ByteNode().read(in) );
-        addChild("Magic", new FixedStringNode().read(in, 3) );
-        addChild("DOS line ending", new FixedStringNode().read(in, 2) );
+        addChild("Magic", new FixedStringNode(3).read(in) );
+        addChild("DOS line ending", new FixedStringNode(2).read(in) );
         addChild("0x1A", new ByteNode().read(in) );
         addChild("0x0A", new ByteNode().read(in) );
 

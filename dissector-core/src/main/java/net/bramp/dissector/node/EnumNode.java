@@ -29,7 +29,7 @@ public class EnumNode<T> extends Node<T> {
     }
 
     public String toString() {
-        return in.value() + " - " + name();
+        return in.toString() + " - " + name();
     }
 
     public Map<T, String> getPossibleValues() {

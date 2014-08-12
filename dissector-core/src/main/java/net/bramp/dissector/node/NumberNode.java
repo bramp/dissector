@@ -15,6 +15,7 @@ public class NumberNode extends Node<Long> {
 
     public NumberNode() {}
 
+	// TODO Move length/signed into constructor
     public NumberNode read(ExtendedRandomAccessFile in, int length) throws IOException {
         return read(in, length, false);
     }

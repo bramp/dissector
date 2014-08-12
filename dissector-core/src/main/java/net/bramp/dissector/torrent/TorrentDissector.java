@@ -62,14 +62,14 @@ public class TorrentDissector extends Dissector {
 	private static class BecodedDictNode extends TreeNode {
 
 		public BecodedDictNode read(ExtendedRandomAccessFile in) throws IOException {
-			addChild("prefix", new FixedStringNode().read(in, 1)); // Should be d
+			addChild("prefix", new FixedStringNode(1).read(in)); // Should be d
 			TreeNode data = addChild("items", new TreeNode().read(in));
 
 			int count = 0;
 			while (true) {
 				Node key = readNode(in);
 				if (key == null) {
-					addChild("trailer", new FixedStringNode().read(in, 1)); // Should be e
+					addChild("trailer", new FixedStringNode(1).read(in)); // Should be e
 					break;
 				}
 
@@ -98,14 +98,14 @@ public class TorrentDissector extends Dissector {
 	private static class BecodedListNode extends ArrayNode {
 
 		public BecodedListNode read(ExtendedRandomAccessFile in) throws IOException {
-			addChild("prefix", new FixedStringNode().read(in, 1)); // Should be d
+			addChild("prefix", new FixedStringNode(1).read(in)); // Should be d
 			ArrayNode data = addChild("list", new ArrayNode().read(in));
 
 			int count = 0;
 			while (true) {
 				Node value = readNode(in);
 				if (value == null) {
-					addChild("trailer", new FixedStringNode().read(in, 1)); // Should be e
+					addChild("trailer", new FixedStringNode(1).read(in)); // Should be e
 					break;
 				}
 				count++;
@@ -121,11 +121,11 @@ public class TorrentDissector extends Dissector {
 
 	private static class BecodedIntegerNode extends TreeNode {
 		public BecodedIntegerNode read(ExtendedRandomAccessFile in) throws IOException {
-			addChild("prefix", new FixedStringNode().read(in, 1)); // Should be i
+			addChild("prefix", new FixedStringNode(1).read(in)); // Should be i
 
 			NullStringNode value = addChild("value", new NullStringNode('e', false).read(in));
 
-			addChild("trailer", new FixedStringNode().read(in, 1)); // Should be e
+			addChild("trailer", new FixedStringNode(1).read(in)); // Should be e
 
 			setTitle("int " + value.value());
 
@@ -141,12 +141,12 @@ public class TorrentDissector extends Dissector {
 		public BecodedStringNode read(ExtendedRandomAccessFile in) throws IOException {
 			NullStringNode lenNode = addChild("length", new NullStringNode(':', false).read(in));
 
-			Node sep = addChild("seperator", new FixedStringNode().read(in, 1));
+			Node sep = addChild("seperator", new FixedStringNode(1).read(in));
 			checkState(sep.value().equals(":"), "Expected ':'");
 
 			long len = Long.parseLong(lenNode.value());
 
-			FixedStringNode value = addChild("value", new FixedStringNode().read(in, len));
+			FixedStringNode value = addChild("value", new FixedStringNode(len).read(in));
 			str = value.value();
 
 			setTitle("string '" + str + "'");

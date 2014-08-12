@@ -47,8 +47,8 @@ public class JavaClassDissector extends Dissector {
 
         ShortNode len;
 
-        addChild( "Magic", new IntNode().read(in, false).base(16) );
-        addChild( "Minor", new ShortNode().read(in, false) );
+        addChild( "Magic", new IntNode().read(in).base(16) );
+        addChild( "Minor", new ShortNode().read(in) );
         addChild( "Major", new EnumNode(majorVersions, new ShortNode().read(in)) );
 
         len = addChild( "Constant pool count", new ShortNode().read(in, false) );

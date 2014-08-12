@@ -77,8 +77,8 @@ public class IsoAtom extends TreeNode {
 	public IsoAtom() {}
 
 	public IsoAtom read(ExtendedRandomAccessFile in, long allowedLength) throws IOException {
-		IntNode length = new IntNode().read(in, false);
-		EnumNode<String> type = new EnumNode<String>(atomTypes, new FixedStringNode().read(in, 4, Charsets.US_ASCII));
+		IntNode length = new IntNode().read(in);
+		EnumNode<String> type = new EnumNode<String>(atomTypes, new FixedStringNode(4, Charsets.US_ASCII).read(in));
 
 		addChild("size", length);
 		addChild("type", type);
@@ -210,7 +210,7 @@ public class IsoAtom extends TreeNode {
 		addChild("flags", new MaskNode(new NumberNode().read(in, 3)));
 
 		addChild("pre_defined", new IntNode().read(in));
-		addChild("handler_type", new EnumNode(handlerTypes, new FixedStringNode().read(in, 4)));
+		addChild("handler_type", new EnumNode(handlerTypes, new FixedStringNode(4).read(in)));
 		addChild("reserved", new IntNode().read(in));
 		addChild("reserved", new IntNode().read(in));
 		addChild("reserved", new IntNode().read(in));
@@ -243,15 +243,15 @@ public class IsoAtom extends TreeNode {
 	}
 
 	protected void readFileTypeAtom(ExtendedRandomAccessFile in, long length) throws IOException {
-		EnumNode<String> brand  = new EnumNode<String>(atomBrands, new FixedStringNode().read(in, 4, Charsets.US_ASCII));
+		EnumNode<String> brand  = new EnumNode<String>(atomBrands, new FixedStringNode(4, Charsets.US_ASCII).read(in));
 		addChild("major_brand", brand );
-		addChild("minor_version", new IntNode().read(in, false) );
+		addChild("minor_version", new IntNode().read(in) );
 
 		if (length > 8) {
 			ArrayNode brands = addChild("compatible_brands", new ArrayNode().read(in));
 			length -= 8;
 			while (length >= 4) {
-				brands.addChild(new EnumNode<String>(atomBrands, new FixedStringNode().read(in, 4, Charsets.US_ASCII)));
+				brands.addChild(new EnumNode<String>(atomBrands, new FixedStringNode(4, Charsets.US_ASCII).read(in)));
 				length -= 4;
 			}
 		}

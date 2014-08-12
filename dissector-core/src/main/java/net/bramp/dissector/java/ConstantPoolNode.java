@@ -75,7 +75,7 @@ public class ConstantPoolNode extends TreeNode {
 
             case 1: // String (UTF-8)
                 ShortNode len = addChild( "length", new ShortNode().read(in) );
-                addChild( "bytes", new FixedStringNode().read(in, len.value()) );
+                addChild( "bytes", new FixedStringNode(len).read(in) );
                 break;
 
             default:

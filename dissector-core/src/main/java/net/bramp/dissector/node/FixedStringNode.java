@@ -16,34 +16,46 @@ public class FixedStringNode extends Node<String> {
 
 	final static int MAX_DISPLAY_WIDTH = 50;
 
-    Charset charset = Charsets.UTF_8;
-    String value;
+    final Charset charset;
+	final long length;
 
-    public FixedStringNode() {}
+	String value;
 
-    public FixedStringNode read(ExtendedRandomAccessFile in, long length) throws IOException {
-        return this.read(in, length, charset);
-    }
+	public FixedStringNode(long length) {
+		this(length, Charsets.UTF_8);
+	}
 
-    public String value() {
-        return value;
-    }
+	public FixedStringNode(Node<? extends Number> lengthNode) {
+		this(lengthNode, Charsets.UTF_8);
+	}
 
-    /**
-     * @param in
-     * @param length in bytes
-     * @param charset
-     * @throws IOException
-     */
-    public FixedStringNode read(ExtendedRandomAccessFile in, long length, Charset charset) throws IOException {
-        this.charset = Preconditions.checkNotNull(charset);
-        setPos(in, length);
+	/**
+	 * @param length in bytes
+	 * @param charset
+	 * @throws IOException
+	 */
+	public FixedStringNode(long length, Charset charset) {
+		this.length = length;
+		this.charset = Preconditions.checkNotNull(charset);
+	}
 
-        byte[] bytes = new byte[(int)length];
-        in.readFully(bytes);
+	public FixedStringNode(Node<? extends Number> lengthNode, Charset charset) {
+		this.length = lengthNode.value().longValue();
+		this.charset = Preconditions.checkNotNull(charset);
+	}
 
-        value = new String(bytes, charset);
-        return this;
+	public String value() {
+		return value;
+	}
+
+	public FixedStringNode read(ExtendedRandomAccessFile in) throws IOException {
+		setPos(in, length);
+
+		byte[] bytes = new byte[(int)length];
+		in.readFully(bytes);
+
+		value = new String(bytes, charset);
+		return this;
     }
 
     public String toString() {
