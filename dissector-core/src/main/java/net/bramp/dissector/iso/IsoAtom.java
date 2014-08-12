@@ -128,7 +128,7 @@ public class IsoAtom extends TreeNode {
 		// Safety check to ensure we get to the right byte
 		long atomend = getStart() + atomlen;
 		if (in.getFilePointer() < atomend ) {
-			addChild("unknown", new SkipNode().read(in, atomend - in.getFilePointer()) );
+			addChild("unknown", new SkipNode(atomend - in.getFilePointer()).read(in) );
 
 		} else if (in.getFilePointer() > atomend) {
 			throw new IllegalArgumentException("Something went wrong parsing atom '" + type.value() + "'. We ended in the wrong position!");
@@ -193,7 +193,7 @@ public class IsoAtom extends TreeNode {
 
 				} else {
 					// Unhandled version
-					addChild("unsupported version", new SkipNode().read(in, length - 4));
+					addChild("unsupported version", new SkipNode(length - 4).read(in));
 					return;
 				}
 
@@ -234,7 +234,7 @@ public class IsoAtom extends TreeNode {
 			addChild("duration", new LongNode().read(in)); // in number of timescale units
 		} else {
 			// Unhandled version
-			addChild("unsupported version", new SkipNode().read(in, length - 4));
+			addChild("unsupported version", new SkipNode(length - 4).read(in));
 			return;
 		}
 
@@ -276,7 +276,7 @@ public class IsoAtom extends TreeNode {
 			addChild("duration", new LongNode().read(in));
 		} else {
 			// Unhandled version
-			addChild("unsupported version", new SkipNode().read(in, length - 4));
+			addChild("unsupported version", new SkipNode(length - 4).read(in));
 			return;
 		}
 
@@ -312,7 +312,7 @@ public class IsoAtom extends TreeNode {
 			addChild("duration", new LongNode().read(in));
 		} else {
 			// Unhandled version
-			addChild("unsupported version", new SkipNode().read(in, length - 4));
+			addChild("unsupported version", new SkipNode(length - 4).read(in));
 			return;
 		}
 

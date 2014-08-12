@@ -64,7 +64,7 @@ public class PngChunkNode extends TreeNode {
         PngChunkNode node;
         switch (type.value()) {
             case "IHDR" : readIHDR(in); break;
-            default     : readUnknown(in, length.value());
+            default     : readUnknown(in, length);
         }
 
         addChild("CRC", new IntNode().base(16).read(in)); // TODO Validate
@@ -74,8 +74,8 @@ public class PngChunkNode extends TreeNode {
         return this;
     }
 
-    protected void readUnknown(ExtendedRandomAccessFile in, long length) throws IOException {
-        addChild("Data", new SkipNode().read(in, length) );
+    protected void readUnknown(ExtendedRandomAccessFile in, IntNode length) throws IOException {
+        addChild("Data", new SkipNode(length).read(in) );
     }
 
     protected void readIHDR(ExtendedRandomAccessFile in) throws IOException {

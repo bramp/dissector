@@ -65,7 +65,7 @@ public class ConstantPoolNode extends TreeNode {
             case 5: // long
             case 6: // double
                 // TODO
-                addChild( "TODO", new SkipNode().read(in, 8) );
+                addChild( "TODO", new SkipNode(8).read(in) );
                 break;
 
             case 12: // NameAndType

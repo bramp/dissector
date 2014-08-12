@@ -19,7 +19,7 @@ public class ExtendedRandomAccessFile implements DataInput {
 
 	final RandomAccessFile file;
 
-	protected ByteOrder endian;
+	protected ByteOrder endian = ByteOrder.BIG_ENDIAN;
 
 	public ExtendedRandomAccessFile(String filename, String mode) throws FileNotFoundException {
         this.file = new RandomAccessFile(filename, mode);

@@ -10,14 +10,19 @@ import java.io.IOException;
  */
 public class SkipNode extends Node<Void> {
 
-    long skipped;
+    final long skipped;
 
-    public SkipNode() {}
+    public SkipNode(long length) {
+	    skipped = length;
+    }
 
-	public SkipNode read(ExtendedRandomAccessFile in, long length) throws IOException {
-        super.setPos(in, length);
-        skipped = length;
-        in.skipBytes(length);
+	public SkipNode(Node<? extends Number> lengthNode) {
+		skipped = lengthNode.value().longValue();
+	}
+
+	public SkipNode read(ExtendedRandomAccessFile in) throws IOException {
+        super.setPos(in, skipped);
+        in.skipBytes(skipped);
         return this;
     }
 

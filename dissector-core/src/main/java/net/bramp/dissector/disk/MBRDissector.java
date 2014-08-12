@@ -16,7 +16,7 @@ public class MBRDissector extends Dissector {
 
     public MBRDissector read(ExtendedRandomAccessFile in) throws IOException {
 
-        addChild( "Boostrap code", new SkipNode().read(in, 218) );
+        addChild( "Boostrap code", new SkipNode(218).read(in) );
 
         // TODO Make this optional, and exend the previous area
         addChild( "Magic", new ShortNode().read(in) ); // 0000h
@@ -25,7 +25,7 @@ public class MBRDissector extends Dissector {
         addChild( "Minutes", new ByteNode().read(in) );
         addChild( "Hours", new ByteNode().read(in) );
 
-        addChild( "Boostrap code", new SkipNode().read(in, 216) );
+        addChild( "Boostrap code", new SkipNode(216).read(in) );
 
         addChild( "Disk signature", new IntNode().read(in).base(16) );
         addChild( "Magic", new ShortNode().read(in) ); // 0000h

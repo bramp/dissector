@@ -275,13 +275,12 @@ public class PartitionEntryNode extends TreeNode {
         .build();
 
     public PartitionEntryNode read(ExtendedRandomAccessFile in) throws IOException {
-        //addChild("skip", new FixedStringNode().read(in, 16) );
-        addChild("status", new ByteNode().read(in).base(16) );
+        addChild("status", new ByteNode().base(16).read(in) );
         addChild("first sector (chs)", new CHSAddressNode().read(in));
         addChild("type", new EnumNode(partitionTypes, new ByteNode().read(in)));
         addChild("last sector (chs)", new CHSAddressNode().read(in));
 
-        addChild("LBA first sector", new IntNode().read(in).base(16) );
+        addChild("LBA first sector", new IntNode().base(16).read(in) );
         addChild("number of sectors", new IntNode().read(in) );
         return this;
     }

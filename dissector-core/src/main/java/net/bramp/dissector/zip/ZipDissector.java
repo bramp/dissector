@@ -1,6 +1,7 @@
 package net.bramp.dissector.zip;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import net.bramp.dissector.io.ExtendedRandomAccessFile;
 import net.bramp.dissector.node.*;
 import net.bramp.dissector.png.PngChunkNode;
