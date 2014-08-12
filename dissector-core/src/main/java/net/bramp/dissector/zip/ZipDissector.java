@@ -11,6 +11,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -18,6 +19,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static net.bramp.dissector.io.IoHelper.searchBackwards;
 
 /**
+ * Zip files
+ * https://en.wikipedia.org/wiki/Zip_(file_format)
+ *
  * @author bramp
  */
 public class ZipDissector extends Dissector {
@@ -31,6 +35,8 @@ public class ZipDissector extends Dissector {
 
 	ShortNode directoryCount;
 	IntNode directoryOffset;
+
+	List<IntNode> fileOffsets = Lists.newArrayList();
 
     public ZipDissector() {}
 
@@ -90,11 +96,44 @@ public class ZipDissector extends Dissector {
 		cd.addChild("Internal file attributes", new ShortNode().read(in) );
 
 		cd.addChild("External file attributes", new IntNode().read(in) );
-		cd.addChild("Relative offset of local file header", new IntNode().read(in) );
+		IntNode fileOffset = cd.addChild("Relative offset of local file header", new IntNode().read(in) );
 
 		cd.addChild("File name", new FixedStringNode(filenameLen).read(in) );
 		cd.addChild("Extra field", new FixedStringNode(extraLen).read(in) );
 		cd.addChild("File comment", new FixedStringNode(commentLen).read(in) );
+
+		// Now read the file
+		fileOffsets.add(fileOffset);
+
+		return cd;
+	}
+
+
+	protected TreeNode readLocalFileHeader(ExtendedRandomAccessFile in) throws IOException {
+
+		TreeNode cd = addChild( "Local file header", new TreeNode().read(in) );
+
+		cd.addChild("signature", new EnumNode(signatureTypes, new IntNode().base(16).read(in)) );
+		cd.addChild("Version needed to extract (min)", new ShortNode().read(in) );
+
+		cd.addChild("General purpose bit flag", new ShortNode().read(in) );
+		cd.addChild("Compression method", new ShortNode().read(in) );
+		cd.addChild("File last modification time", new ShortNode().read(in) );
+		cd.addChild("File last modification date", new ShortNode().read(in) );
+
+		cd.addChild("CRC-32", new IntNode().read(in) );
+		IntNode compressedLen = cd.addChild("Compressed size", new IntNode().read(in) );
+		cd.addChild("Uncompressed size", new IntNode().read(in) );
+
+		ShortNode filenameLen = cd.addChild("File name length", new ShortNode().read(in) );
+		ShortNode extraLen = cd.addChild("Extra field length", new ShortNode().read(in) );
+
+		cd.addChild("File name", new FixedStringNode(filenameLen).read(in) );
+		cd.addChild("Extra field", new FixedStringNode(extraLen).read(in) );
+
+		cd.addChild("Compressed data", new SkipNode(compressedLen).read(in));
+
+		// TODO Support Data descriptor
 
 		return cd;
 	}
@@ -110,8 +149,14 @@ public class ZipDissector extends Dissector {
 			    return this;
 
 		    in.seek( directoryOffset.value() );
-			for (int i = 0; i < directoryCount.value(); i++)
-		        readCd(in);
+			for (int i = 0; i < directoryCount.value(); i++) {
+				readCd(in);
+			}
+
+		    for (IntNode fileOffset : fileOffsets) {
+			    in.seek( fileOffset.value() );
+			    readLocalFileHeader(in);
+		    }
 
 	    } catch (EOFException eof) {
 		    // Ignore

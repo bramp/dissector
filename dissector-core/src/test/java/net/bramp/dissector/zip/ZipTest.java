@@ -40,8 +40,13 @@ public class ZipTest {
 		for (String path : reflections.getResources(Pattern.compile(".*\\.zip"))) {
 			System.out.print(path);
 			ExtendedRandomAccessFile in = open( path );
-			new ZipDissector().read(in); // Read but don't do anything with it
-			System.out.println(" [OK]");
+			try {
+				new ZipDissector().read(in); // Read but don't do anything with it
+				System.out.println(" [OK]");
+			} catch (Exception e) {
+				System.out.println(" [BAD]");
+			}
+
 		}
 	}
 
