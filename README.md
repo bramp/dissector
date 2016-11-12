@@ -1,3 +1,5 @@
+# Warning: This project is abandoned, and in a unfinished state. Feel free to pick up the project, or take a look at my newer https://github.com/bramp/dsector which is very similar, but written in Go.
+
 dissector
 =========
 
